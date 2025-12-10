@@ -1,14 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
+import '../routes.dart';
 import 'package:haha/widgets/input_field.dart';
 import 'package:haha/widgets/primary_button.dart';
-import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../routes.dart'; // Add this import
 
-// ignore: use_key_in_widget_constructors
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -18,17 +18,15 @@ class _LoginPageState extends State<LoginPage> {
   final AuthService _auth = AuthService();
   bool _loading = false;
 
-  void _login() async {
+  Future<void> _login() async {
     setState(() => _loading = true);
     try {
       await _auth.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, Routes.home); // Use Routes constant
+      Navigator.pushReplacementNamed(context, Routes.home);
     } on FirebaseAuthException catch (e) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Login failed')),
       );
@@ -40,43 +38,91 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset("assets/tic-computer.png", height: 80),
-                SizedBox(height: 50),
-                Text(
-                  'Welcome Back',
-                  style: Theme.of(context).textTheme.headlineSmall,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFE3F2FD), // pastel blue
+              Color(0xFFBBDEFB), // deeper pastel blue
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 18),
-                InputField(
-                  controller: _emailController,
-                  label: 'Email',
-                  keyboardType: TextInputType.emailAddress,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      child: Image.asset(
+                        "assets/tic-computer.png",
+                        width: 110,
+                        height: 140,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Welcome to HAHA App',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                        color: Colors.grey[900],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 25),
+                    InputField(
+                      controller: _emailController,
+                      label: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 12),
+                    InputField(
+                      controller: _passwordController,
+                      label: 'Password',
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      text: 'Login',
+                      onPressed: _login,
+                      loading: _loading,
+                    ),
+                    const SizedBox(height: 14),
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, Routes.signup),
+                      child: const Text(
+                        'Create account',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 12),
-                InputField(
-                  controller: _passwordController,
-                  label: 'Password',
-                  obscureText: true,
-                ),
-                SizedBox(height: 16),
-                PrimaryButton(
-                  text: 'Login',
-                  onPressed: _login,
-                  loading: _loading,
-                ),
-                SizedBox(height: 12),
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, Routes.signup), // Use Routes constant
-                  child: Text('Create account'),
-                ),
-              ],
+              ),
             ),
           ),
         ),
